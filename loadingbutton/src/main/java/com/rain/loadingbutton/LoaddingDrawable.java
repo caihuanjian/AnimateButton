@@ -39,8 +39,8 @@ public class LoaddingDrawable extends Drawable {
     private AnimatorSet mAnimatorSet;
     private static final Interpolator ANGLE_INTERPOLATOR = new LinearInterpolator();
     private static final Interpolator SWEEP_INTERPOLATOR = new AccelerateDecelerateInterpolator();
-    private static final int ANGLE_ANIMATOR_DURATION = 20000;
-    private static final int SWEEP_ANIMATOR_DURATION = 7000;
+    private static final int ANGLE_ANIMATOR_DURATION = 2000;
+    private static final int SWEEP_ANIMATOR_DURATION = 700;
     private static final Float MIN_SWEEP_ANGLE = 50f;
 
     private RectF boundF;

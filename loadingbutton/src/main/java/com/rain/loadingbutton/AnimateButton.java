@@ -8,7 +8,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -16,7 +15,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -105,10 +103,12 @@ public class AnimateButton extends Button {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.save();
-        if (mCurState == State.LOADING && !isChanging) {
-            drawLoadding(canvas);
-        } else if (mCurState == State.DONE) {
-            drawDoneAnimation(canvas);
+        if (!isChanging) {
+            if (mCurState == State.LOADING) {
+                drawLoadding(canvas);
+            } else if (mCurState == State.DONE) {
+                drawDoneAnimation(canvas);
+            }
         }
         canvas.restore();
     }
@@ -131,14 +131,7 @@ public class AnimateButton extends Button {
     }
 
     private void drawDoneAnimation(Canvas canvas) {
-        if (mIndicateDrawable == null) {
-            final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp);
-            mIndicateDrawable = new IndicateDrawable(this, mParams.mFinalFillColor, bitmap);
-            mIndicateDrawable.setBounds(0, 0, getWidth(), getHeight());
-            mIndicateDrawable.animateIndicate();
-        } else {
-            mIndicateDrawable.draw(canvas);
-        }
+        mIndicateDrawable.draw(canvas);
     }
 
     public void startAnimation() {
@@ -182,27 +175,98 @@ public class AnimateButton extends Button {
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(widthAnimator, heightAnimator, cornerAnimator);
-        animatorSet.setDuration(2000);
+        animatorSet.setDuration(300);
         animatorSet.setInterpolator(new AccelerateInterpolator());
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 isChanging = false;
                 setCompoundDrawablesRelative(mParams.mDrawables[0], mParams.mDrawables[1], mParams.mDrawables[2], mParams.mDrawables[3]);
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        loadingComplete();
-                    }
-                };
-                new Handler().postDelayed(runnable, 1000);
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        loadingComplete(BitmapFactory.decodeResource(getResources(), R.drawable.ic_alarm_on_white_48dp), mParams.mFinalFillColor, true);
+//                    }
+//                };
+//                new Handler().postDelayed(runnable, 1000);
             }
         });
         animatorSet.start();
     }
 
-    private void loadingComplete() {
+    private void startRevert() {
+        if (mCurState != State.DONE) {
+            return;
+        }
+        isChanging = true;
+
+        int fromWidth = getWidth();
+        int fromHeight = getHeight();
+
+        int toWidth = mParams.mInitialWidth;
+        int toHeight = mParams.mInitialHeight;
+
+        ObjectAnimator cornerAnimator = ObjectAnimator.ofFloat(mGradientDrawable, "cornerRadius", mParams.mFinalCornerRadius, mParams.mInitialCornerRadius);
+
+        ValueAnimator widthAnimator = ValueAnimator.ofFloat(fromWidth, toWidth);
+        widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float val = (float) animation.getAnimatedValue();
+                final ViewGroup.LayoutParams layoutParams = getLayoutParams();
+                layoutParams.width = (int) val;
+                setLayoutParams(layoutParams);
+            }
+        });
+        ValueAnimator heightAnimator = ValueAnimator.ofFloat(fromHeight, toHeight);
+        heightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float val = (float) animation.getAnimatedValue();
+                final ViewGroup.LayoutParams layoutParams = getLayoutParams();
+                layoutParams.height = (int) val;
+                setLayoutParams(layoutParams);
+            }
+        });
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(widthAnimator, heightAnimator, cornerAnimator);
+        animatorSet.setDuration(300);
+        animatorSet.setInterpolator(new AccelerateInterpolator());
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isChanging = false;
+                setCompoundDrawablesRelative(mParams.mDrawables[0], mParams.mDrawables[1], mParams.mDrawables[2], mParams.mDrawables[3]);
+                mCurState = State.IDLE;
+                setClickable(true);
+                setText(mParams.mText);
+            }
+        });
+        animatorSet.start();
+    }
+
+    /**
+     * @Description: invoke when loading complete!
+     */
+    public void loadingComplete(Bitmap indicateBitmap, int fillColor, boolean reverse) {
+        if (mCurState != State.LOADING) {
+            return;
+        }
         mCurState = State.DONE;
+
+        mIndicateDrawable = new IndicateDrawable(this, fillColor, indicateBitmap);
+        mIndicateDrawable.setBounds(0, 0, getWidth(), getHeight());
+        mIndicateDrawable.animateIndicate();
+
+        if (reverse) {
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startRevert();
+                }
+            }, 1000);
+        }
     }
 
     private class Params {

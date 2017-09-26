@@ -61,7 +61,6 @@ public class IndicateDrawable extends Drawable {
         if (canDrawBitmap) {
             mImagePaint.setAlpha(mImageAlpha);
             mIndicateDrawable.draw(canvas);
-//            canvas.drawBitmap(mIndicateBitmap, mBounds.left, mBounds.top, mImagePaint);
         }
     }
 
@@ -73,7 +72,7 @@ public class IndicateDrawable extends Drawable {
         mMaxRadius = size / 2;
         centerX = (bounds.left + bounds.right) / 2;
         centerY = (bounds.top + bounds.bottom) / 2;
-        float offset = 0.35f * size;
+        float offset = 0.35f * size;//一个圆的内接矩形的边长 ≈ 外接矩形边长 * 0.7
         int left = (int) (centerX - offset);
         int top = (int) (centerY - offset);
         int right = (int) (centerX + offset);
@@ -100,7 +99,15 @@ public class IndicateDrawable extends Drawable {
     }
 
     public void animateIndicate() {
+        if (isRunning()) {
+            return;
+        }
+        isRunning = true;
         setupAnimation();
+    }
+
+    private boolean isRunning() {
+        return isRunning;
     }
 
     private void setupAnimation() {
