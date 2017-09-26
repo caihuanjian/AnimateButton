@@ -182,13 +182,6 @@ public class AnimateButton extends Button {
             public void onAnimationEnd(Animator animation) {
                 isChanging = false;
                 setCompoundDrawablesRelative(mParams.mDrawables[0], mParams.mDrawables[1], mParams.mDrawables[2], mParams.mDrawables[3]);
-//                Runnable runnable = new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        loadingComplete(BitmapFactory.decodeResource(getResources(), R.drawable.ic_alarm_on_white_48dp), mParams.mFinalFillColor, true);
-//                    }
-//                };
-//                new Handler().postDelayed(runnable, 1000);
             }
         });
         animatorSet.start();
