@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
     tools:context="com.rain.animatebutton.MainActivity">
 
     <Button
         android:id="@+id/btn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_margin="15dp"
         android:onClick="onClick" />
 
-</FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.rain.loadingbutton.AnimateButton
+            android:id="@+id/loadding_btn"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:background="@drawable/default_shape"
+            app:finalCornerRadius="200dp"
+            app:initialCornerRadius="50dp"
+            app:spinning_bar_color="#8f09ef">
+
+        </com.rain.loadingbutton.AnimateButton>
+    </LinearLayout>
+
+</LinearLayout>
