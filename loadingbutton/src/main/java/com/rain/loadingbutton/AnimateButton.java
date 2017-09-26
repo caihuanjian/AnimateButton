@@ -7,6 +7,8 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -33,6 +36,8 @@ public class AnimateButton extends Button {
     private LoaddingDrawable mCicleLoadingDrawable;
 
     private GradientDrawable mGradientDrawable;
+
+    private IndicateDrawable mIndicateDrawable;
 
     private Params mParams;
 
@@ -85,6 +90,7 @@ public class AnimateButton extends Button {
             mParams.mPaddingProgress = typedArray.getDimension(R.styleable.LoadingButton_spinning_bar_padding, 0);
             mParams.mInitialCornerRadius = typedArray.getDimension(R.styleable.LoadingButton_initialCornerRadius, 0);
             mParams.mFinalCornerRadius = typedArray.getDimension(R.styleable.LoadingButton_finalCornerRadius, 100);
+            mParams.mFinalFillColor = typedArray.getColor(R.styleable.LoadingButton_finalFillColor, Color.BLACK);
             typedArray.recycle();
             bgTypeArray.recycle();
         }
@@ -112,10 +118,10 @@ public class AnimateButton extends Button {
             mCicleLoadingDrawable = new LoaddingDrawable(this, mParams.mSpinningBarWidth, mParams.mSpinningBarColor);
             int offsetCenter = (getHeight() - getWidth()) / 2;
 
-            int left = mParams.mPaddingProgress.intValue();
-            int top = mParams.mPaddingProgress.intValue() + offsetCenter;
-            int right = getWidth() - mParams.mPaddingProgress.intValue();
-            int bottom = getHeight() - mParams.mPaddingProgress.intValue() - offsetCenter;
+            int left = (int) mParams.mPaddingProgress;
+            int top = (int) (mParams.mPaddingProgress + offsetCenter);
+            int right = (int) (getWidth() - mParams.mPaddingProgress);
+            int bottom = (int) (getHeight() - mParams.mPaddingProgress - offsetCenter);
             mCicleLoadingDrawable.setBounds(left, top, right, bottom);
             mCicleLoadingDrawable.setCallback(this);
             mCicleLoadingDrawable.start();
@@ -125,9 +131,15 @@ public class AnimateButton extends Button {
     }
 
     private void drawDoneAnimation(Canvas canvas) {
-
+        if (mIndicateDrawable == null) {
+            final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp);
+            mIndicateDrawable = new IndicateDrawable(this, mParams.mFinalFillColor, bitmap);
+            mIndicateDrawable.setBounds(0, 0, getWidth(), getHeight());
+            mIndicateDrawable.animateIndicate();
+        } else {
+            mIndicateDrawable.draw(canvas);
+        }
     }
-
 
     public void startAnimation() {
         if (mCurState != State.IDLE) {
@@ -177,17 +189,29 @@ public class AnimateButton extends Button {
             public void onAnimationEnd(Animator animation) {
                 isChanging = false;
                 setCompoundDrawablesRelative(mParams.mDrawables[0], mParams.mDrawables[1], mParams.mDrawables[2], mParams.mDrawables[3]);
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingComplete();
+                    }
+                };
+                new Handler().postDelayed(runnable, 1000);
             }
         });
         animatorSet.start();
     }
 
+    private void loadingComplete() {
+        mCurState = State.DONE;
+    }
+
     private class Params {
         private float mSpinningBarWidth;
         private int mSpinningBarColor;
-        private Float mPaddingProgress;
-        private Integer mInitialHeight;
+        private float mPaddingProgress;
+        private int mInitialHeight;
         private int mInitialWidth;
+        private int mFinalFillColor;
         private String mText;
         private float mInitialCornerRadius;
         private float mFinalCornerRadius;

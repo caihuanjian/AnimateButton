@@ -6,5 +6,6 @@
         <attr name="spinning_bar_padding" format="dimension" />
         <attr name="initialCornerRadius" format="dimension" />
         <attr name="finalCornerRadius" format="dimension" />
+        <attr name="finalFillColor" format="color" />
     </declare-styleable>
 </resources>
