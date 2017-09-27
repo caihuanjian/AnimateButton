@@ -1,1 +1,1 @@
-![gif]()
+![gif](https://github.com/caihuanjian/AnimateButton/blob/master/art/loading.gif)
