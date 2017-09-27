@@ -87,7 +87,7 @@ public class LoaddingDrawable extends Drawable {
 
     @Override
     protected void onBoundsChange(Rect bounds) {
-        final float padding = mBorderWidth / 2f + .6f;//加0.几的偏移，不然会loadding会绘制到背景之外，实在想不明白。。。。
+        final float padding = mBorderWidth / 2 + .5f;
         boundF.left = bounds.left + padding;
         boundF.right = bounds.right - padding;
         boundF.top = bounds.top + padding;

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -19,7 +20,6 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
-
 
 /**
  * Created by HwanJ.Choi on 2017-9-25.
@@ -51,11 +51,16 @@ public class AnimateButton extends Button {
     }
 
     public AnimateButton(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context, attrs, defStyleAttr);
+        this(context, attrs, defStyleAttr, 0);
     }
 
-    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public AnimateButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         mParams = new Params();
         if (attrs == null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -64,8 +69,8 @@ public class AnimateButton extends Button {
                 mGradientDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.default_shape);
             }
         } else {
-            final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.LoadingButton);
-            final TypedArray bgTypeArray = context.obtainStyledAttributes(attrs, new int[]{android.R.attr.background});
+            final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.LoadingButton,defStyleAttr,defStyleRes);
+            final TypedArray bgTypeArray = context.obtainStyledAttributes(attrs, new int[]{android.R.attr.background},defStyleAttr,defStyleRes);
             try {
                 mGradientDrawable = (GradientDrawable) bgTypeArray.getDrawable(0);
             } catch (ClassCastException e) {

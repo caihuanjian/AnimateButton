@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             animateButton.loadingComplete(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_alarm_on_white_48dp), getResources().getColor(R.color.colorPrimary), true);
+                    R.drawable.ic_done_white_48dp), getResources().getColor(R.color.colorPrimary), true);
         }
     };
 

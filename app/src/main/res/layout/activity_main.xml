@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     android:padding="20dp"
     tools:context="com.rain.animatebutton.MainActivity">
@@ -14,6 +15,7 @@
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal|center_vertical"
         android:background="@drawable/default_shape"
+        android:clickable="true"
         android:gravity="center"
         android:text="@string/app_name"
         app:finalCornerRadius="200dp"
